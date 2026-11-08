@@ -120,6 +120,17 @@ export function LoginForm({
         <button className={btn} disabled={busy}>
           {busy ? "Sending…" : "Email me a sign-in link"}
         </button>
+        <button
+          type="button"
+          className="w-full py-2 text-sm font-medium text-muted"
+          onClick={() => {
+            if (!email.trim()) return setError("Enter your email first, then tap this again.");
+            setError(null);
+            setStep("code");
+          }}
+        >
+          I already have a code
+        </button>
       </form>
       {googleEnabled && (
         <>

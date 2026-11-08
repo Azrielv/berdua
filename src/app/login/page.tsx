@@ -16,7 +16,11 @@ export default async function LoginPage({
       <h1 className="text-3xl font-semibold tracking-tight">{APP_NAME}</h1>
       <p className="mt-1 text-muted">Plan dates, places and life — together.</p>
       <LoginForm
-        initialError={error ? "That sign-in link didn't work. Request a new one." : null}
+        initialError={
+          error
+            ? "That sign-in link didn't work. It may have expired, or opened in a different browser. Type the 6-digit code from the email instead, or request a new one."
+            : null
+        }
         googleEnabled={process.env.NEXT_PUBLIC_ENABLE_GOOGLE_AUTH === "true"}
       />
     </main>
