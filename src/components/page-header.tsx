@@ -10,7 +10,7 @@ export function PageHeader({
   back?: string;
 }) {
   return (
-    <header className="sticky top-0 z-30 bg-background/90 pt-[env(safe-area-inset-top)] backdrop-blur">
+    <header className="sticky top-0 z-30 bg-background pt-[env(safe-area-inset-top)]">
       <div className="flex h-14 items-center gap-2 px-4">
         {back && (
           <Link
@@ -23,7 +23,7 @@ export function PageHeader({
             </svg>
           </Link>
         )}
-        <h1 className="min-w-0 flex-1 truncate text-xl font-semibold tracking-tight">{title}</h1>
+        <h1 className="min-w-0 flex-1 truncate font-display text-2xl font-semibold tracking-tight">{title}</h1>
         {action}
       </div>
     </header>

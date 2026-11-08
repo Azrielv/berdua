@@ -1,8 +1,19 @@
 
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="112" fill="#e11d48"/>
-  <g transform="translate(256 256) scale(1) translate(-256 -256)">
-    <path d="M256 404 C 120 316 92 252 92 204 C 92 158 128 124 172 124 C 206 124 236 144 256 174 C 276 144 306 124 340 124 C 384 124 420 158 420 204 C 420 252 392 316 256 404 Z" fill="#fff"/>
-    <circle cx="256" cy="232" r="22" fill="#e11d48"/>
-  </g>
+  <rect width="512" height="512" rx="112" fill="#c8324a"/>
+  <g transform="translate(256 262) scale(0.86) translate(-256 -292)">
+  <!-- heart = their two bodies -->
+  <path d="M256 300 C 240 262 210 236 172 236 C 126 236 98 270 98 314
+           C 98 366 150 408 256 472 C 362 408 414 366 414 314
+           C 414 270 386 236 340 236 C 302 236 272 262 256 300 Z" fill="#ffffff"/>
+  <!-- the line where they meet -->
+  <path d="M256 304 L256 468" stroke="#c8324a" stroke-width="12" stroke-linecap="round"/>
+  <!-- him -->
+  <circle cx="198" cy="166" r="48" fill="#ffffff"/>
+  <!-- her: head + bun -->
+  <circle cx="314" cy="166" r="48" fill="#ffffff"/>
+  <circle cx="352" cy="124" r="25" fill="#ffffff"/>
+  <!-- small gaps between heads and shoulders -->
+  <path d="M150 218 Q 198 236 246 218" stroke="#c8324a" stroke-width="10" fill="none" stroke-linecap="round"/>
+  <path d="M266 218 Q 314 236 362 218" stroke="#c8324a" stroke-width="10" fill="none" stroke-linecap="round"/></g>
 </svg>

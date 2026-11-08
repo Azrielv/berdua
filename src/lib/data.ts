@@ -5,7 +5,7 @@ import type { SpecialEvent } from "./events";
 export type DateCategory = "date_night" | "anniversary" | "trip" | "errand";
 
 export const CATEGORIES: Record<DateCategory, { label: string; emoji: string; color: string }> = {
-  date_night: { label: "Date night", emoji: "🍷", color: "#e11d48" },
+  date_night: { label: "Date night", emoji: "🍷", color: "#c8324a" },
   anniversary: { label: "Anniversary", emoji: "💍", color: "#a855f7" },
   trip: { label: "Trip", emoji: "✈️", color: "#0ea5e9" },
   errand: { label: "Errand", emoji: "🛒", color: "#f59e0b" },
@@ -104,7 +104,7 @@ export type ExpenseCategory =
 
 export const EXPENSE_CATEGORIES: Record<ExpenseCategory, { label: string; emoji: string; color: string }> = {
   food: { label: "Food", emoji: "🍜", color: "#f97316" },
-  date: { label: "Dates", emoji: "💕", color: "#e11d48" },
+  date: { label: "Dates", emoji: "💕", color: "#c8324a" },
   groceries: { label: "Groceries", emoji: "🛒", color: "#22c55e" },
   transport: { label: "Transport", emoji: "🚗", color: "#0ea5e9" },
   shopping: { label: "Shopping", emoji: "🛍️", color: "#a855f7" },
@@ -138,14 +138,23 @@ export async function fetchExpensesForMonth(sb: SupabaseClient, month: string, n
 }
 
 /** Net balance from my point of view: positive = partner owes me. */
-export async function fetchBalance(sb: SupabaseClient, myId: string) {
+export type BalanceRow = { user_id: string; credit: number };
+
+/** Raw per-person credits; doesn't need to know who "me" is, so it can run in parallel. */
+export async function fetchBalanceRows(sb: SupabaseClient) {
   const { data, error } = await sb.rpc("expense_balance");
   if (error) throw error;
+  return (data ?? []) as BalanceRow[];
+}
+
+export function netBalance(rows: BalanceRow[], myId: string) {
   let net = 0;
-  for (const row of (data ?? []) as { user_id: string; credit: number }[]) {
-    net += (row.user_id === myId ? 1 : -1) * Number(row.credit);
-  }
+  for (const row of rows) net += (row.user_id === myId ? 1 : -1) * Number(row.credit);
   return Math.round(net * 100) / 100;
+}
+
+export async function fetchBalance(sb: SupabaseClient, myId: string) {
+  return netBalance(await fetchBalanceRows(sb), myId);
 }
 
 export function monthSpend(expenses: Pick<Expense, "amount" | "category">[]) {
@@ -181,7 +190,7 @@ export const PLACE_CATEGORIES: Record<PlaceCategory, { label: string; emoji: str
 };
 
 export const PLACE_STATUS: Record<PlaceStatus, { label: string; short: string; color: string }> = {
-  want: { label: "Want to go", short: "Want", color: "#e11d48" },
+  want: { label: "Want to go", short: "Want", color: "#c8324a" },
   been: { label: "Been there", short: "Been", color: "#0ea5e9" },
   fav: { label: "Favourite", short: "Fav", color: "#f59e0b" },
 };

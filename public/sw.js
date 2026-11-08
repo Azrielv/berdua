@@ -2,7 +2,7 @@
 // - App shell + static assets: cache-first (hashed, never change)
 // - Pages: network-first, falling back to the last saved copy, then /offline.html
 // - Web Push: shows reminders and opens the right screen when tapped
-const VERSION = "v3";
+const VERSION = "v4";
 const STATIC = `berdua-static-${VERSION}`;
 const PAGES = "berdua-pages"; // cleared on sign-out (see login page)
 const OFFLINE_URL = "/offline.html";
@@ -86,7 +86,7 @@ self.addEventListener("push", (event) => {
     self.registration.showNotification(msg.title, {
       body: msg.body,
       icon: "/icons/icon-192.png",
-      badge: "/icons/icon-192.png",
+      badge: "/icons/badge-96.png",
       tag: msg.tag,
       renotify: !!msg.tag,
       data: { url: msg.url },

@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { PageHeader } from "@/components/page-header";
-import { displayName, memberNames, requireCouple } from "@/lib/auth";
+import { displayName, memberNames, requireCoupleAnd } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import {
   CATEGORIES,
-  fetchBalance,
+  fetchBalanceRows,
   fetchDueTodos,
+  netBalance,
   fetchEvents,
   fetchExpensesForMonth,
   fetchNextDate,
@@ -25,20 +26,20 @@ import { addDays, addMonths, dayKey, fmtDayShort, fmtRelativeDay, fmtTime, klToI
 import { TodayTodos } from "./today-todos";
 
 export default async function HomePage() {
-  const session = await requireCouple();
-  const { profile, partner, couple } = session;
-  const me = displayName(profile, "You");
   const now = new Date();
   const today = dayKey(now);
   const month = today.slice(0, 7);
   const sb = await createClient();
-  const [next, expenses, balance, events, dueTodos] = await Promise.all([
-    fetchNextDate(sb, now.toISOString()),
+  // Everything in parallel: RLS already limits rows to this couple.
+  const [session, next, expenses, balanceRows, events, dueTodos] = await requireCoupleAnd([fetchNextDate(sb, now.toISOString()),
     fetchExpensesForMonth(sb, month, addMonths(month, 1)),
-    fetchBalance(sb, profile.id),
+    fetchBalanceRows(sb),
     fetchEvents(sb),
     fetchDueTodos(sb, klToISO(addDays(today, 1))),
   ]);
+  const { profile, partner, couple } = session;
+  const me = displayName(profile, "You");
+  const balance = netBalance(balanceRows, profile.id);
 
   const anniversary = anniversaryEvent(couple.anniversary);
   const upcoming = [...(anniversary ? [anniversary] : []), ...events]
@@ -83,7 +84,7 @@ export default async function HomePage() {
               {daysBetween(today, nextDay) === 0 ? "Today!" : `in ${countdownText(daysBetween(today, nextDay))}`}
             </p>
           </div>
-          <p className="mt-1 text-2xl font-semibold">{next.title}</p>
+          <p className="mt-1 font-display text-2xl font-semibold">{next.title}</p>
           <p className="mt-2 text-sm opacity-90">
             {fmtRelativeDay(nextDay, today)} · {fmtTime(next.starts_at)}
             {next.place_name && ` · ${next.place_name}`}
@@ -92,14 +93,14 @@ export default async function HomePage() {
       ) : (
         <Link href="/dates/new" className="mx-4 block rounded-2xl bg-brand p-5 text-white shadow-sm">
           <p className="text-sm opacity-90">Next date</p>
-          <p className="mt-1 text-2xl font-semibold">Nothing planned yet</p>
+          <p className="mt-1 font-display text-2xl font-semibold">Nothing planned yet</p>
           <p className="mt-2 text-sm opacity-90">Tap to plan one →</p>
         </Link>
       )}
 
       <section className="mt-5">
         <div className="flex items-baseline justify-between px-4 pb-2">
-          <h2 className="font-semibold">Countdowns</h2>
+          <h2 className="font-display text-lg font-semibold">Countdowns</h2>
           <Link href="/events" className="text-sm font-medium text-brand">
             {upcoming.length ? "Manage" : "Add"}
           </Link>
@@ -124,7 +125,7 @@ export default async function HomePage() {
                   <p className="text-2xl" aria-hidden>
                     {k.emoji}
                   </p>
-                  <p className="mt-2 text-2xl font-semibold tabular-nums" style={{ color: k.color }}>
+                  <p className="mt-2 font-display text-2xl font-semibold tabular-nums" style={{ color: k.color }}>
                     {countdownText(o.daysAway)}
                   </p>
                   <p className="mt-0.5 line-clamp-2 text-sm font-medium">{occurrenceLabel(o)}</p>
@@ -166,7 +167,7 @@ export default async function HomePage() {
       >
         <div>
           <p className="text-sm text-muted">Spent this month</p>
-          <p className="mt-0.5 text-xl font-semibold tabular-nums">{fmtRM(monthSpend(expenses))}</p>
+          <p className="mt-0.5 font-display text-xl font-semibold tabular-nums">{fmtRM(monthSpend(expenses))}</p>
         </div>
         {partner && balance !== 0 && (
           <p className="text-right text-sm text-muted">

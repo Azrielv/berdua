@@ -1,6 +1,6 @@
 export type ThemePref = "system" | "light" | "dark";
 export const THEME_KEY = "berdua-theme";
-export const THEME_COLORS = { light: "#fff7f8", dark: "#140d10" } as const;
+export const THEME_COLORS = { light: "#f6f3ee", dark: "#121110" } as const;
 
 /**
  * Runs inline in <head> before first paint so there's no flash of the wrong

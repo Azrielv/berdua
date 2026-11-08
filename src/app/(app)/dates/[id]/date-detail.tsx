@@ -90,7 +90,7 @@ export function DateDetail({
           >
             {cat.emoji} {cat.label}
           </span>
-          <h1 className="mt-2 text-2xl font-semibold tracking-tight">{date.title}</h1>
+          <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight">{date.title}</h1>
           <p className="mt-1 text-muted">
             {fmtDayLong(day)} · {fmtTime(date.starts_at)}
           </p>

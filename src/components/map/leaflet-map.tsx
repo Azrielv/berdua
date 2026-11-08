@@ -23,7 +23,7 @@ export type LeafletMapProps = {
 
 import { KL_CENTER } from "./constants";
 
-function pinIcon(color = "#e11d48") {
+function pinIcon(color = "#c8324a") {
   return L.divIcon({
     className: "",
     iconSize: [32, 40],

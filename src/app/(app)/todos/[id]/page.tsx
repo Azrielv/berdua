@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { memberNames, requireCouple } from "@/lib/auth";
+import { memberNames, requireCoupleAnd } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { fetchTodoList } from "@/lib/data";
 import { dayKey } from "@/lib/time";
@@ -9,8 +9,8 @@ export const metadata = { title: "To-do list" };
 
 export default async function TodoListPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const session = await requireCouple();
-  const data = await fetchTodoList(await createClient(), id);
+  const sb = await createClient();
+  const [session, data] = await requireCoupleAnd([fetchTodoList(sb, id)]);
   if (!data) notFound();
   return (
     <ListClient

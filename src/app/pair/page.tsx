@@ -14,7 +14,7 @@ export default async function PairPage() {
     <main className="mx-auto min-h-dvh max-w-md px-6 pb-10 pt-[calc(env(safe-area-inset-top)+2rem)]">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Pair with your partner</h1>
+          <h1 className="font-display text-3xl font-semibold tracking-tight">Pair with your partner</h1>
           <p className="mt-1 text-sm text-muted">
             One of you shares a code, the other enters it. That&apos;s it.
           </p>

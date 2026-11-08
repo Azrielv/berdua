@@ -14,37 +14,39 @@ export type Couple = { id: string; invite_code: string; anniversary: string | nu
 const PROFILE_COLS = "id, name, avatar_url, couple_id";
 const COUPLE_COLS = "id, invite_code, anniversary";
 
+type ProfileWithCouple = Profile & { couples: Couple | null };
+
 /** Current user, their profile, couple and partner (deduped per request). */
 export const getSession = cache(async () => {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
 
-  const { data: profile } = await supabase
+  // getClaims verifies the JWT locally (no round trip to Supabase Auth).
+  const { data } = await supabase.auth.getClaims();
+  const claims = data?.claims;
+  if (!claims?.sub) return null;
+  const user = { id: claims.sub, email: (claims.email as string | undefined) ?? null };
+
+  // One query: RLS returns exactly my row + my partner's row, each with the couple.
+  const { data: rows } = await supabase
     .from("profiles")
-    .select(PROFILE_COLS)
-    .eq("id", user.id)
-    .maybeSingle<Profile>();
+    .select(`${PROFILE_COLS}, couples(${COUPLE_COLS})`)
+    .returns<ProfileWithCouple[]>();
 
-  let couple: Couple | null = null;
-  let partner: Profile | null = null;
-  if (profile?.couple_id) {
-    const [c, p] = await Promise.all([
-      supabase.from("couples").select(COUPLE_COLS).eq("id", profile.couple_id).maybeSingle<Couple>(),
-      supabase
-        .from("profiles")
-        .select(PROFILE_COLS)
-        .eq("couple_id", profile.couple_id)
-        .neq("id", user.id)
-        .maybeSingle<Profile>(),
-    ]);
-    couple = c.data;
-    partner = p.data;
-  }
+  const strip = (r: ProfileWithCouple): Profile => ({
+    id: r.id,
+    name: r.name,
+    avatar_url: r.avatar_url,
+    couple_id: r.couple_id,
+  });
+  const mine = rows?.find((r) => r.id === user.id) ?? null;
+  const theirs = rows?.find((r) => r.id !== user.id && mine?.couple_id && r.couple_id === mine.couple_id) ?? null;
 
-  return { user, profile, couple, partner };
+  return {
+    user,
+    profile: mine ? strip(mine) : null,
+    couple: mine?.couples ?? null,
+    partner: theirs ? strip(theirs) : null,
+  };
 });
 
 /** For pages inside the app: must be signed in and have a couple. */
@@ -53,6 +55,24 @@ export async function requireCouple() {
   if (!s) redirect("/login");
   if (!s.profile || !s.couple) redirect("/pair");
   return { ...s, profile: s.profile, couple: s.couple };
+}
+
+/**
+ * requireCouple() + page queries, all in parallel. RLS already limits rows to
+ * the couple, so the queries don't need to wait. If the session check fails,
+ * its redirect wins over any query error.
+ */
+export async function requireCoupleAnd<T extends readonly unknown[] | []>(tasks: T) {
+  const [session, ...rest] = await Promise.allSettled([requireCouple(), ...tasks]);
+  if (session.status === "rejected") throw session.reason;
+  const values = rest.map((r) => {
+    if (r.status === "rejected") throw r.reason;
+    return r.value;
+  });
+  return [session.value, ...values] as unknown as [
+    Awaited<ReturnType<typeof requireCouple>>,
+    ...{ -readonly [P in keyof T]: Awaited<T[P]> },
+  ];
 }
 
 /** { userId: name } for both partners, to show "added by" / "ticked by". */

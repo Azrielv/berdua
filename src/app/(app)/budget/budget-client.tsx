@@ -107,7 +107,7 @@ export function BudgetClient({
           <p className="text-sm opacity-90">
             {isThisMonth ? "Spent this month" : `Spent in ${fmtMonth(month)}`}
           </p>
-          <p className="mt-1 text-3xl font-semibold tabular-nums">{fmtRM(total)}</p>
+          <p className="mt-1 font-display text-4xl font-semibold tabular-nums">{fmtRM(total)}</p>
           <p className="mt-2 text-sm opacity-90">
             {me.name} {fmtRM(paidBy(me.id))}
             {partner && ` · ${partner.name} ${fmtRM(paidBy(partner.id))}`}
