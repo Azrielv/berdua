@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+/* `dark:` follows the resolved theme set on <html data-theme> (see lib/theme.ts). */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+:root {
+  color-scheme: light;
+  --background: #fff7f8;
+  --surface: #ffffff;
+  --foreground: #1f1720;
+  --muted: #7a6870;
+  --border: #f1dde2;
+  --brand: #e11d48;
+  --brand-soft: #ffe4ea;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --background: #140d10;
+  --surface: #1f1519;
+  --foreground: #f5e9ec;
+  --muted: #b39ea6;
+  --border: #36252c;
+  --brand: #fb7185;
+  --brand-soft: #3a1820;
+}
+
+/* No-JS fallback: follow the system. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --background: #140d10;
+    --surface: #1f1519;
+    --foreground: #f5e9ec;
+    --muted: #b39ea6;
+    --border: #36252c;
+    --brand: #fb7185;
+    --brand-soft: #3a1820;
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-brand: var(--brand);
+  --color-brand-soft: var(--brand-soft);
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+html,
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans, system-ui), system-ui, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* Darker map tiles in dark mode (markers keep their colours). */
+[data-theme="dark"] .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) brightness(0.95) contrast(0.9);
+}
+[data-theme="dark"] .leaflet-container {
+  background: #1b1418;
+}
+[data-theme="dark"] .leaflet-control-attribution,
+[data-theme="dark"] .leaflet-bar a {
+  background: #1f1519cc;
+  color: #b39ea6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

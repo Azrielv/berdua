@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Berdua — offline</title>
+    <style>
+      body { margin: 0; min-height: 100vh; display: grid; place-items: center;
+        font-family: system-ui, sans-serif; background: #fff7f8; color: #1f1720; text-align: center; padding: 24px; }
+      @media (prefers-color-scheme: dark) { body { background: #140d10; color: #f5e9ec; } }
+      h1 { font-size: 20px; margin: 12px 0 4px; }
+      p { opacity: .7; margin: 0 0 16px; }
+      button { background: #e11d48; color: #fff; border: 0; border-radius: 999px; padding: 10px 20px; font-size: 15px; }
+    </style>
+  </head>
+  <body>
+    <div>
+      <img src="/icons/icon-192.png" width="72" height="72" alt="" />
+      <h1>You're offline</h1>
+      <p>Reconnect to sync with your partner.</p>
+      <button onclick="location.reload()">Try again</button>
+    </div>
+  </body>
+</html>
